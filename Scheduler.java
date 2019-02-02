@@ -1,4 +1,5 @@
 
+
 // Scheduler.java
 // Maveric Garde 101031617
 // This class is the Intermediate of a Client/Server UDP client on
@@ -16,7 +17,8 @@ public class Scheduler {
 	DatagramSocket sendSocket, receiveSocket;
 	Date currentDate;
 	int elevatorState1, elevatorState2, elevatorState3, //will have to turn these into thread safe
-		elevatorFloor1, elevatorFloor2, elevatorFloor3; //collections, ArrayList? 
+		elevatorFloor1, elevatorFloor2, elevatorFloor3, //collections, ArrayList? 
+		fromPort;
 	Collection<Integer> c = Collections.synchronizedCollection(new ArrayList<Integer>(6)); //this will eventually be used to synch states (0-2) and current floors (3-5)	
 	static int ELEVATOR1PORT = 69, PACKETSIZE = 25, CLIENTPORT, SELFPORT = 219;
 
@@ -43,9 +45,12 @@ public class Scheduler {
 	}
 
 	private int getBestElevator() {
-		//from current data which elevator is best to send
-		//return its number
-		return -1;
+		if(fromPort == ELEVATOR1PORT) {
+			return 0;
+		}
+		else {
+			return ELEVATOR1PORT;
+		}
 	}
 
 	private void sendElevator(int elev, int floor, byte msg[]) {
@@ -97,7 +102,7 @@ public class Scheduler {
 		System.out.println("Scheduler: Packet received:");
 		System.out.println("From host: " + receivePacket.getAddress());
 		System.out.println("Host port: " + receivePacket.getPort());
-		int fromPort = receivePacket.getPort();
+		fromPort = receivePacket.getPort();
 		int len = receivePacket.getLength();
 		System.out.println("Length: " + len);
 		System.out.print("Containing: " );
@@ -131,7 +136,7 @@ public class Scheduler {
 			// System.out.println(received);
 		}
 		//decode data packet from elevator and update status bars for elevators
-		if(fromPort == 2c) { //received from elevator
+		if(fromPort == 2) { //received from elevator
 			int elevatorNumber = data[0];
 			int floorDecode = data[2];
 			int currFloor;
@@ -166,19 +171,7 @@ public class Scheduler {
 			e.printStackTrace();
 			System.exit(1);
 		}
-
-
-
-
 		//Identify and get best elevators port for send packet
-
-
-
-
-
-
-
-
 
 		// We're finished, so close the sockets.
 		sendSocket.close();
@@ -197,3 +190,6 @@ public class Scheduler {
 		}
 	}
 }
+
+
+
